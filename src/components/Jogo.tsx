@@ -1,10 +1,10 @@
+
 import React, { useRef, useState } from 'react';
 import { JogoProps } from '../types/interfaces';
 import { StyledDivPrincipalJogo } from './JogoCss';
 
 const Jogo: React.FC<JogoProps> = ({
   verificarLetra,
-  palavraEscolhida,
   categoriaEscolhida,
   letras,
   letrasAdivinhadas,

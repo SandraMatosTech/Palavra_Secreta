@@ -1,6 +1,8 @@
-import { FimJogoProps } from "src/types/interfaces";
+import React from "react";
+import { FimJogoProps } from "../types/interfaces";
 import "./FimJogoCss";
 import { StyledDivFimJogo } from "./FimJogoCss";
+
 
 export const FimJogo: React.FC<FimJogoProps> = ({ reiniciarJogo, pontuacao }) => {
   return (

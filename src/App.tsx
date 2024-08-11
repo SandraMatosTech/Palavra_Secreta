@@ -3,7 +3,8 @@ import "./App.css";
 import TelaInicial from "./components/TelaInicial";
 import { listaPalavras } from "./data/palavras";
 import { FimJogo } from "./components/FimJogo";
-import Jogo  from "./components/Jogo";
+import Jogo from "./components/Jogo";
+import { PalavrasProps } from "./types/interfaces"; 
 
 type Estagio = {
   id: number;
@@ -16,11 +17,13 @@ const estagio: Estagio[] = [
   { id: 3, name: "end" },
 ];
 
+type Categoria = keyof PalavrasProps;
+
 function App() {
   const [estagioJogo, setEstagioJogo] = useState<string>(estagio[0].name);
-  const [palavras] = useState(listaPalavras);
+  const [palavras] = useState<PalavrasProps>(listaPalavras);
   const [palavraEscolhida, setPalavraEscolhida] = useState<string>("");
-  const [categoriaEscolhida, setCategoriaEscolhida] = useState<string>("");
+  const [categoriaEscolhida, setCategoriaEscolhida] = useState<Categoria | undefined>(undefined); 
   const [letras, setLetras] = useState<string[]>([]);
   const [letrasAdivinhadas, setLetrasAdivinhadas] = useState<string[]>([]);
   const [letrasErradas, setLetrasErradas] = useState<string[]>([]);
@@ -28,7 +31,7 @@ function App() {
   const [pontuacao, setPontuacao] = useState<number>(0);
 
   const escolhendoPalavraECategoria = useCallback(() => {
-    const categorias = Object.keys(palavras);
+    const categorias = Object.keys(palavras) as Categoria[];
     const categoria = categorias[Math.floor(Math.random() * categorias.length)];
     const palavra =
       palavras[categoria][
@@ -43,14 +46,13 @@ function App() {
     const { palavra, categoria } = escolhendoPalavraECategoria();
     console.log(palavra, categoria);
   
-    let letraPalavra = palavra.split("").map((l) => l.toLowerCase());
+    const letraPalavra = palavra.split("").map((l) => l.toLowerCase());
+
     setPalavraEscolhida(palavra);
     setCategoriaEscolhida(categoria);
     setLetras(letraPalavra);
   }, [escolhendoPalavraECategoria]);
   
-  
-
   const verificarLetra = (letra: string) => {
     const letraNormal = letra.toLowerCase();
     if (
@@ -86,14 +88,15 @@ function App() {
   }, [tentativas]);
 
   useEffect(() => {
-    const letrasUnicas = [...new Set(letras)];
-    if (letrasAdivinhadas.length === letrasUnicas.length && estagioJogo === "game") {
-      setPontuacao((atualPontuacao) => atualPontuacao + 100);
-      iniciarJogo();
+    if (categoriaEscolhida) { 
+      const letrasUnicas = [...new Set(letras)];
+      if (letrasAdivinhadas.length === letrasUnicas.length && estagioJogo === "game") {
+        setPontuacao((atualPontuacao) => atualPontuacao + 100);
+        iniciarJogo();
+      }
     }
-  }, [letrasAdivinhadas, letras, iniciarJogo, estagioJogo]);
+  }, [letrasAdivinhadas, letras, iniciarJogo, estagioJogo, categoriaEscolhida]);
   
-
   const reiniciarJogo = () => {
     setPontuacao(0);
     setTentativas(3);
@@ -107,7 +110,7 @@ function App() {
         <Jogo
           verificarLetra={verificarLetra}
           palavraEscolhida={palavraEscolhida}
-          categoriaEscolhida={categoriaEscolhida}
+          categoriaEscolhida={categoriaEscolhida || ''} 
           letras={letras}
           letrasAdivinhadas={letrasAdivinhadas}
           letrasErradas={letrasErradas}
